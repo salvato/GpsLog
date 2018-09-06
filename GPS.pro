@@ -31,6 +31,7 @@ QT += core
 QT += gui
 QT += widgets
 QT += positioning
+
 android {
     QT += androidextras
 }
