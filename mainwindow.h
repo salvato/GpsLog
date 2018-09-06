@@ -75,15 +75,24 @@ private:
     QSettings*              pSettings;
 #endif
     QFile*                  pLogFile;
+
     QLabel*                 pAltitudeLabel;
+    QLabel*                 pAltitudeErrorLabel;
     QLabel*                 pLatitudeLabel;
+    QLabel*                 pLatitudeErrorLabel;
     QLabel*                 pLongitudeLabel;
+    QLabel*                 pLongitudeErrorLabel;
     QLabel*                 pDateTimeLabel;
+
     QLineEdit*              pStatusEdit;
     QLineEdit*              pAltitudeEdit;
+    QLineEdit*              pAltitudeErrorEdit;
     QLineEdit*              pLatitudeEdit;
+    QLineEdit*              pLatitudeErrorEdit;
     QLineEdit*              pLongitudeEdit;
+    QLineEdit*              pLongitudeErrorEdit;
     QLineEdit*              pDateTimeEdit;
+
     QPushButton*            pStartButton;
     QPushButton*            pPauseButton;
     QPushButton*            pExitButton;
