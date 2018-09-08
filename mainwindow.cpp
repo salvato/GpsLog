@@ -180,10 +180,9 @@ MainWindow::check_permission() {
     }
     return true;
 }
-#endif
 
+#else
 
-#ifndef Q_OS_ANDROID
 void
 MainWindow::selectLogDir() {
     QFileDialog* pGetDirDlg;
