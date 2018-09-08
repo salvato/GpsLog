@@ -242,21 +242,31 @@ MainWindow::createPanel() {
     layout->addWidget(pAltitudeLabel,  0, 0, 1, 1);
     layout->addWidget(pLatitudeLabel,  1, 0, 1, 1);
     layout->addWidget(pLongitudeLabel, 2, 0, 1, 1);
-    layout->addWidget(pDateTimeLabel,  3, 0, 1, 1);
 
     layout->addWidget(pAltitudeEdit,  0, 1, 1, 2);
     layout->addWidget(pLatitudeEdit,  1, 1, 1, 2);
     layout->addWidget(pLongitudeEdit, 2, 1, 1, 2);
-    layout->addWidget(pDateTimeEdit,  3, 1, 1, 2);
+
+    layout->addWidget(pAltitudeErrorLabel,  0, 3, 1, 1);
+    layout->addWidget(pLatitudeErrorLabel,  1, 3, 1, 1);
+    layout->addWidget(pLongitudeErrorLabel, 2, 3, 1, 1);
+
+    layout->addWidget(pAltitudeErrorEdit,  0, 4, 1, 1);
+    layout->addWidget(pLatitudeErrorEdit,  1, 4, 1, 1);
+    layout->addWidget(pLongitudeErrorEdit, 2, 4, 1, 1);
+
+    layout->addWidget(pDateTimeLabel,  3, 0, 1, 1);
+    layout->addWidget(pDateTimeEdit,   3, 1, 1, 4);
+
 
     auto* buttonLayout = new QHBoxLayout();
     buttonLayout->addWidget(pStartButton);
     buttonLayout->addWidget(pPauseButton);
     buttonLayout->addWidget(pExitButton);
 
-    layout->addLayout(buttonLayout, 4, 0, 1, 3);
+    layout->addLayout(buttonLayout, 4, 0, 1, 5);
 
-    layout->addWidget(pStatusEdit,  5, 0, 1, 3);
+    layout->addWidget(pStatusEdit,  5, 0, 1, 5);
 
     return layout;
 }
@@ -264,19 +274,31 @@ MainWindow::createPanel() {
 
 void
 MainWindow::createPanelElements() {
-    pAltitudeLabel = new QLabel(tr("Altitudine"));
-    pLatitudeLabel = new QLabel(tr("Latitudine"));
-    pLongitudeLabel = new QLabel(tr("Longitudine"));
-    pDateTimeLabel = new QLabel(tr("Data"));
+    pAltitudeLabel       = new QLabel(tr("Altitudine"));
+    pAltitudeErrorLabel  = new QLabel(tr("+/- [m]"));
+    pLatitudeLabel       = new QLabel(tr("Latitudine"));
+    pLatitudeErrorLabel  = new QLabel(tr("+/- [m]"));
+    pLongitudeLabel      = new QLabel(tr("Longitudine"));
+    pLongitudeErrorLabel = new QLabel(tr("+/- [m]"));
 
-    pAltitudeEdit  = new QLineEdit("------------");
-    pLatitudeEdit  = new QLineEdit("------------");
-    pLongitudeEdit = new QLineEdit("------------");
-    pDateTimeEdit  = new QLineEdit("------------");
+    pDateTimeLabel       = new QLabel(tr("Data"));
+
+    pAltitudeEdit       = new QLineEdit("------------");
+    pAltitudeErrorEdit  = new QLineEdit("------------");
+    pLatitudeEdit       = new QLineEdit("------------");
+    pLatitudeErrorEdit  = new QLineEdit("------------");
+    pLongitudeEdit      = new QLineEdit("------------");
+    pLongitudeErrorEdit = new QLineEdit("------------");
+
+    pDateTimeEdit       = new QLineEdit("------------");
 
     pAltitudeEdit->setReadOnly(true);
+    pAltitudeErrorEdit->setReadOnly(true);
     pLatitudeEdit->setReadOnly(true);
+    pLatitudeErrorEdit->setReadOnly(true);
     pLongitudeEdit->setReadOnly(true);
+    pLongitudeErrorEdit->setReadOnly(true);
+
     pDateTimeEdit->setReadOnly(true);
 
     pStartButton   = new QPushButton("Start");
@@ -300,11 +322,17 @@ MainWindow::postionUpdated(QGeoPositionInfo info) {
     if(newGeoCoordinate.distanceTo(previousGeoCoordinate) > 1.0) {
         previousGeoCoordinate = newGeoCoordinate;
         QDateTime dateTime = info.timestamp();
-        double altitude = -9999.99;
+        double altitude      = -9999.99;
+        double altitudeError = -1.0;
         if(newGeoCoordinate.type() == QGeoCoordinate::Coordinate3D) {
             altitude = newGeoCoordinate.altitude();
+            if(info.hasAttribute(QGeoPositionInfo::VerticalAccuracy))
+                altitudeError = info.attribute(QGeoPositionInfo::VerticalAccuracy);
         }
         double latitude = newGeoCoordinate.latitude();
+        double positionError = -1.0;
+        if(info.hasAttribute(QGeoPositionInfo::HorizontalAccuracy))
+           positionError = info.attribute(QGeoPositionInfo::HorizontalAccuracy);
         double longitude = newGeoCoordinate.longitude();
         if(pLogFile) {
             if(pLogFile->isOpen()) {
@@ -314,15 +342,20 @@ MainWindow::postionUpdated(QGeoPositionInfo info) {
                 pLogFile->write(",");
                 pLogFile->write(QString("%1").arg(longitude, 12, 'g', 10).toUtf8().data());
                 pLogFile->write(",");
+                pLogFile->write(QString("%1").arg(positionError, 6, 'g', 10).toUtf8().data());
+                pLogFile->write(",");
                 pLogFile->write(QString("%1").arg(altitude, 12, 'g', 10).toUtf8().data());
                 pLogFile->write("\n");
                 pLogFile->flush();
             }
         }
         // Updates UI
-        pLatitudeEdit->setText(QString("%1").arg(latitude,   12, 'g', 10));
-        pLongitudeEdit->setText(QString("%1").arg(longitude, 12, 'g', 10));
         pAltitudeEdit->setText(QString("%1").arg(altitude,   12, 'g', 10));
+        pAltitudeErrorEdit->setText(QString("%1").arg(altitudeError,   6, 'g', 10));
+        pLatitudeEdit->setText(QString("%1").arg(latitude,   6, 'g', 10));
+        pLatitudeErrorEdit->setText(QString("%1").arg(positionError,   6, 'g', 10));
+        pLongitudeEdit->setText(QString("%1").arg(longitude, 12, 'g', 10));
+        pLongitudeErrorEdit->setText(QString("%1").arg(positionError, 6, 'g', 10));
         pDateTimeEdit->setText(dateTime.toString());
     }
 }
