@@ -150,6 +150,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 #ifdef Q_OS_ANDROID
+
 // Taken from https://bugreports.qt.io/browse/QTBUG-50759
 bool
 MainWindow::check_permission() {
@@ -207,6 +208,7 @@ MainWindow::selectLogDir() {
     if(!sLogDir.endsWith(QString("/"))) sLogDir+= QString("/");
     logDir.setPath(sLogDir);
 }
+
 #endif
 
 
