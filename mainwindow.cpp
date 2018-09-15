@@ -121,6 +121,8 @@ MainWindow::MainWindow(QWidget *parent)
         exit(EXIT_FAILURE);
     }
 
+    pLogFile->write("Date, latitude, longitude, position error, altitude\n");
+
     // Initialize the previous point as non existing
     previousGeoCoordinate.setLatitude(0.0);
     previousGeoCoordinate.setLongitude(0.0);
